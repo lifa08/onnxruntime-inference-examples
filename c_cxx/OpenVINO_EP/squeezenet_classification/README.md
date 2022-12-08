@@ -11,6 +11,45 @@ The source code for this sample is available [here](https://github.com/microsoft
 ## Prerequisites
 1. [The Intel<sup>®</sup> Distribution of OpenVINO toolkit](https://docs.openvinotoolkit.org/latest/index.html)
 
+### Install OpenVINO Runtime
+
+```bash
+$ sudo mkdir /opt/intel
+$ curl -L https://storage.openvinotoolkit.org/repositories/openvino/packages/2022.2/linux/l_openvino_toolkit_ubuntu20_2022.2.0.7713.af16ea1d79a_x86_64.tgz --output openvino_2022.2.0.7713.tgz
+$ tar -xf openvino_2022.2.0.7713.tgz
+$ sudo mv l_openvino_toolkit_ubuntu20_2022.2.0.7713.af16ea1d79a_x86_64 /opt/intel/openvino_2022.2.0.7713
+$ cd /opt/intel/
+$ sudo ln -s openvino_2022.2.0.7713 openvino_2022
+$ cd /opt/intel/openvino_2022.2.0.7713/
+$ source setupvars.sh
+[setupvars.sh] ERROR: Unsupported Python version. Please install one of Python 3.6 - 3.9 (64-bit) from https://www.python.org/downloads/
+```
+
+To solve python version problem, install python3.9, and let python3 point to python3.9
+
+```bash
+$ sudo -E add-apt-repository ppa:deadsnakes/ppa
+$ sudo apt install python3.9
+$ which python3.9
+/usr/bin/python3.9
+$ python3 --version
+Python 3.10.6
+$ sudo ln -sf /usr/bin/python3.9 /usr/bin/python3
+```
+
+### Compile Onnxruntime with OpenVINO
+
+```bash
+$ source /opt/intel/openvino_2022/setupvars.sh
+[setupvars.sh] OpenVINO environment initialized
+
+$ ./build.sh --config RelWithDebInfo --use_openvino CPU_FP32 --build_shared_lib
+$ tools/ci_build/github/linux/copy_strip_binary.sh -r build/Linux/ -a onnxruntime -l libonnxruntime.so.1.14.0 -c RelWithDebInfo -s . -t 8b0669bf63d18cf6a90416d68af29cd306bcbbf7
+$ cp -r build/Linux/onnxruntime/ ~/install/
+$ cp libonnxruntime_providers_openvino.so ~/install/onnxruntime/lib/
+$ cp libonnxruntime_providers_shared.so ~/install/onnxruntime/lib/
+```
+
 2. Use opencv (use the same opencv package that comes builtin with Intel<sup>®</sup> Distribution of OpenVINO toolkit)
 3. Use any sample image as input to the sample.
 4. Download the latest Squeezenet model from the ONNX Model Zoo.
